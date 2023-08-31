@@ -119,6 +119,7 @@ if __name__ == "__main__":
     rospy.init_node("imu")
     port = rospy.get_param("~port", "/dev/ttyUSB0")
     baudrate = rospy.get_param("~baudrate", 921600)
+    rate = rospy.Rate(200)
     imu_msg = Imu()
     try:
         hf_imu = serial.Serial(port=port, baudrate=baudrate, timeout=0.5)
@@ -146,3 +147,4 @@ if __name__ == "__main__":
                     buff_data = hf_imu.read(buff_count)
                     for i in range(0, buff_count):
                         handleSerialData(buff_data[i])
+                rate.sleep()

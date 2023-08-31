@@ -167,6 +167,7 @@ if __name__ == "__main__":
     gra_normalization = rospy.get_param("~gra_normalization", True)
     imu_msg = Imu()
     mag_msg = MagneticField()
+    rate = rospy.Rate(300)
     try:
         hf_imu = serial.Serial(port=port, baudrate=baudrate, timeout=0.5)
         if hf_imu.isOpen():
@@ -194,3 +195,4 @@ if __name__ == "__main__":
                     buff_data = hf_imu.read(buff_count)
                     for i in range(0, buff_count):
                         handleSerialData(buff_data[i])
+                rate.sleep()
