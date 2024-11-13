@@ -33,8 +33,8 @@ class ImuNode(Node):
         self.port = self.get_parameter('port').get_parameter_value().string_value
         self.baudrate = self.get_parameter('baudrate').get_parameter_value().integer_value
 
-        self.imu_pub = self.create_publisher(Imu, 'handsfree/imu', 10)
-        self.mag_pub = self.create_publisher(MagneticField, 'handsfree/mag', 10)
+        self.imu_pub = self.create_publisher(Imu, '/imu', 10)
+        self.mag_pub = self.create_publisher(MagneticField, '/mag', 10)
 
         self.timer = self.create_timer(0.005, self.read_serial_data)  # 200 Hz
 
@@ -142,10 +142,10 @@ class ImuNode(Node):
         current_time = self.get_clock().now().to_msg()
 
         imu_msg.header.stamp = current_time
-        imu_msg.header.frame_id = 'base_link'
+        imu_msg.header.frame_id = 'base_footprint'
 
         mag_msg.header.stamp = current_time
-        mag_msg.header.frame_id = 'base_link'
+        mag_msg.header.frame_id = 'base_footprint'
 
         angle_radian = [angle * math.pi / 180 for angle in self.angle_degree]
         qua = quaternion_from_euler(angle_radian[0], angle_radian[1], angle_radian[2])
