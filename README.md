@@ -1,3 +1,16 @@
+#Video from Sensor Working
+https://youtu.be/nqLqxJgGF_k
+
+## Scripts you need to run to get ROS2 data (For B9 model)
+Directly from serial run:
+
+imu_standalone.py
+
+or for ROS2 run:
+
+read_imu_data_decoded.py
+
+
 # HandsFree ROS IMU用户手册
 
 ![](./tutorials/imu_user_manual/01_综合介绍/img/1.jpg)
