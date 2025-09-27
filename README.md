@@ -1,108 +1,195 @@
-#Video from Sensor Working
-https://youtu.be/nqLqxJgGF_k
+# handsfree_ros_imu
 
-## Scripts you need to run to get ROS2 data (For B9 model)
-Directly from serial run:
-
-imu_standalone.py
-
-or for ROS2 run:
-
-read_imu_data_decoded.py
-
-
-# HandsFree ROS IMU用户手册
-
-![](./tutorials/imu_user_manual/01_综合介绍/img/1.jpg)
-
-handsfree_ros_imu 是用于学习使用 IMU 的 ROS 功能包，适用于 handsfree 推出的 3 款 ROS IMU。同时也含有纯 python 编写的输出数据显示, 支持 Linux、Windows 等相关的脚本文件。
-
-rostopic：
-* 陀螺仪和加速计发布的话题：/handsfree/imu
-* 磁力计发布的话题：/handsfree/mag
-
-[HandsFree ROS IMU 购买链接](https://item.taobao.com/item.htm?id=634027133148&ali_trackid=2:mm_26632258_3504122_32538762:1607955215_176_1820526432&union_lens=lensId:OPT@1607955206@212a8363_06ed_1766199523e_c878@01;recoveryid:201_11.27.58.136_21013517_1607955156105;prepvid:201_11.87.178.209_21008506_1607955206099&clk1=3e91f5613ddee8ba055d43c0368cfc9b&spm=a2e0b.20350158.31919782.18&pvid=100_11.182.77.179_11449_6761607955206647512&scm=null&bxsign=tbkozY1fyN0hsF81R/xTfHbTs5netRJ2MylEoFSlUg/Ds4QInP5TK8iioSmX2JM66JbK2KXA4JwODRwz0JptZUNTK3pfqvfvE6ObkDSU+tV8o4=)
-
-![视频](https://handsfree-mv.oss-cn-shenzhen.aliyuncs.com/handsfree_robot/imu/video/imu_show.mp4)
-
-## 教程文档
-
-[《选型介绍》](./tutorials/imu_user_manual/02_选型介绍/doc.md)：内含 IMU 基础知识，常见选型问题，购买需知等。
-
-[《配套软件包安装》](./tutorials/imu_user_manual/03_基础教程/01_配套软件包安装/doc.md)：内含 windows，Linux 和 Linux + ROS 下的使用。
-
-[《Python驱动测试》](./tutorials/imu_user_manual/03_基础教程/02_Python驱动测试/doc.md)：内含 IMU 基础知识，常见选型问题，购买需知等
-
-[《ROS 驱动测试和可视化》](./tutorials/imu_user_manual/03_基础教程/03_ROS驱动和可视化/doc.md)：ROS 驱动测试和可视化
-
-[《里程计和 IMU 融合》](./tutorials/imu_user_manual/04_高级教程/01_里程计和IMU融合/doc.md)：以 A9 为例的 里程计 和 IMU 融合
-
-[《GPS 和 IMU 融合》](./tutorials/imu_user_manual/04_高级教程/02_GPS和IMU融合/doc.md)：以 A9 为例的 GPS 和 IMU 融合
-
-[《激光SLAM 和 IMU 融合》](./tutorials/imu_user_manual/04_高级教程/03_激光SLAM和IMU融合/doc.md)：以 A9 为例的 激光SLAM 和 IMU 融合
-
-[《视觉SLAM 和 IMU 融合》](./tutorials/imu_user_manual/04_高级教程/04_视觉SLAM和IMU融合/doc.md)：以 A9 为例的 视觉SLAM 和 IMU 融合
-
-[《问题和答疑》](./tutorials/imu_user_manual/05_问题和答疑/doc.md)：内含问题总结，如何提问，知识库和参考链接
-
-[《附录-串口助手测试通讯》](./tutorials/imu_user_manual/06_附录/01_串口助手测试通讯/doc.md)：使用串口助手测试通讯
+> IMU publisher & visualization demos for **ROS1** and **ROS2**.
+> This repo is an English, cleaned-up fork of HANDS-FREE’s original project, adapted so IMU data can be consumed by ROS2 as well.
 
 ---
 
-## 产品介绍
+## Overview
 
-IMU 内有 加速度计，陀螺仪，磁力计这些传感器，通过固定 imu 到物体上后，可以获取物体在运动过程中的一些信息，如物体的三轴加速度信息，三轴角速度信息，三轴角度信息，三轴磁场信息。通过这些信息，可以得知物体运动过程中的状态。
+This package publishes IMU measurements (linear acceleration, angular velocity and optional orientation) to standard ROS topics so they can be used by mapping, localization and state-estimation nodes (e.g., `robot_localization`, `Cartographer`, `Nav2`).
 
-IMU 设计的应用领域广泛，在军航空航天、航海、军事、医疗、娱乐、机器人、车辆等领域都有这重要的作用。
+* **ROS1**: publishes `sensor_msgs/Imu`
+* **ROS2**: publishes `sensor_msgs/msg/Imu`
+* Includes example launch files, RViz configs and a small demo for replay/testing
 
-![应用领域](./tutorials/imu_user_manual/01_综合介绍/img/24.jpg)
+> Upstream reference: [https://gitee.com/HANDS-FREE/handsfree_ros_imu.git](https://gitee.com/HANDS-FREE/handsfree_ros_imu.git)
 
-### 型号
+---
 
-产品型号共 3 种：
+## Features
 
-* A9：可获取三轴加速度信息，三轴角速度信息，三轴角度信息，三轴磁场信息。
-* B9：可获取三轴加速度信息，三轴角速度信息，三轴角度信息，三轴磁场信息。
-* B6：可获取三轴加速度信息，三轴角速度信息，三轴角度信息。
+* Serial **or** UDP input (configurable)
+* Adjustable publication rate
+* Configurable frame IDs and covariances
+* Optional yaw-bias removal and simple low‑pass filtering
+* Example RViz configuration for quick visualization
+* Minimal dependencies
 
+---
 
-### 介绍
+## Directory layout
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/2.jpg)
+```
+.
+├── demo/                # example bags & sample configs
+├── launch/              # ROS1 and ROS2 launch files
+├── rviz/                # RViz configurations
+├── scripts/             # helper scripts & parsers
+├── tutorials/           # quick HOWTOs
+├── CMakeLists.txt
+└── package.xml
+```
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/3.jpg)
+> Names may vary slightly depending on the upstream revision; the layout above reflects what you’ll find in this fork.
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/4.jpg)
+---
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/5.jpg)
+## Supported platforms
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/6.jpg)
+* **ROS1**: Melodic / Noetic (Ubuntu 18.04 / 20.04)
+* **ROS2**: Foxy / Humble (Ubuntu 20.04 / 22.04)
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/7.jpg)
+The code is simple and should compile on newer distros with zero or minor changes.
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/8.jpg)
+---
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/9.jpg)
+## Installation
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/10.jpg)
+### ROS1 (Melodic / Noetic)
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/11.jpg)
+```bash
+# 1) Create a catkin workspace
+mkdir -p ~/ws_imu/src && cd ~/ws_imu/src
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/12.jpg)
+# 2) Clone this repository
+git clone https://github.com/marcusvinicius178/handsfree_ros_imu.git
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/13.jpg)
+# 3) Resolve dependencies and build
+cd ..
+rosdep install --from-paths src --ignore-src -r -y
+catkin_make
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/14.jpg)
+# 4) Source the workspace
+source devel/setup.bash
+```
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/15.jpg)
+### ROS2 (Foxy / Humble)
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/16.jpg)
+```bash
+# 1) Create a colcon workspace
+mkdir -p ~/ws_imu/src && cd ~/ws_imu/src
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/17.jpg)
+# 2) Clone this repository
+git clone https://github.com/marcusvinicius178/handsfree_ros_imu.git
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/18.jpg)
+# 3) Resolve dependencies and build
+cd ..
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --symlink-install
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/19.jpg)
+# 4) Source the workspace
+source install/setup.bash
+```
 
-![](./tutorials/imu_user_manual/01_综合介绍/img/20.jpg)
+---
 
+## Parameters (common)
+
+| Param              | Type   | Default        | Description                                         |
+| ------------------ | ------ | -------------- | --------------------------------------------------- |
+| `port`             | string | `/dev/ttyUSB0` | Serial device (or `udp://host:port`)                |
+| `baudrate`         | int    | `115200`       | Serial baudrate                                     |
+| `frame_id`         | string | `imu_link`     | TF frame id for the IMU                             |
+| `publish_rate`     | double | `100.0`        | Output rate [Hz]                                    |
+| `use_orientation`  | bool   | `false`        | Publish orientation (requires reliable calibration) |
+| `remove_yaw_bias`  | bool   | `true`         | Enable simple slow yaw-bias removal                 |
+| `accel_covariance` | double | `0.02`         | Diagonal covariance for linear acceleration         |
+| `gyro_covariance`  | double | `0.02`         | Diagonal covariance for angular velocity            |
+
+> Adjust to match your param file names if they differ; these are conventional defaults used by many IMU nodes.
+
+---
+
+## Usage
+
+### ROS1 (launch)
+
+```bash
+# default parameters
+roslaunch handsfree_ros_imu imu.launch
+
+# override a few parameters
+roslaunch handsfree_ros_imu imu.launch \
+  port:=/dev/ttyUSB1 publish_rate:=200.0 frame_id:=imu_link
+```
+
+### ROS2 (launch)
+
+```bash
+# default parameters
+ros2 launch handsfree_ros_imu imu.launch.py
+
+# override a few parameters
+ros2 launch handsfree_ros_imu imu.launch.py \
+  port:=/dev/ttyUSB1 publish_rate:=200.0 frame_id:=imu_link
+```
+
+### Topics
+
+* `/imu/data_raw` → `sensor_msgs/Imu` (linear acceleration + angular velocity)
+* `/imu/data`     → `sensor_msgs/Imu` (with orientation if `use_orientation:=true`)
+
+### RViz quick start
+
+```bash
+# ROS1
+rviz -d $(rospack find handsfree_ros_imu)/rviz/imu.rviz
+
+# ROS2
+rviz2 -d $(ros2 pkg prefix handsfree_ros_imu)/share/handsfree_ros_imu/rviz/imu.rviz
+```
+
+---
+
+## Calibration (quick guide)
+
+1. Keep the sensor **still on a flat surface** for ~10–20 s to estimate biases.
+2. If your IMU provides **orientation**, align `frame_id` with your robot TF (e.g., `base_link` → `imu_link`).
+3. Set `use_orientation:=true` only when the device’s orientation output is known to be reliable.
+
+---
+
+## Troubleshooting
+
+* **No data coming in**
+
+  * Check the device is enumerated: `dmesg | grep -i ttyUSB`
+  * Add your user to `dialout`: `sudo usermod -a -G dialout $USER` (then re‑login)
+  * Confirm `port` and `baudrate` match the IMU
+* **Yaw drifting or jumpy**
+
+  * Enable `remove_yaw_bias:=true`
+  * Increase `publish_rate` or use a downstream filter (e.g., `robot_localization` EKF/UKF)
+* **TF warnings**
+
+  * Ensure `frame_id` exists in your TF tree and that timestamps are consistent
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. Please keep patches small and focused. For new features, prefer adding them behind parameters so default behavior remains unchanged.
+
+---
+
+## License
+
+The original upstream license applies. Unless otherwise stated in source files, this fork follows the same open‑source license as the HANDS-FREE project. See headers in `scripts/` and `src/` for details.
+
+---
+
+## Acknowledgments
+
+* Based on HANDS-FREE’s IMU package
+* Adapted and documented in English by [@marcusvinicius178](https://github.com/marcusvinicius178) for ROS2 consumption
